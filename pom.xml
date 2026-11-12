@@ -8,7 +8,7 @@
     <groupId>com.poly</groupId>
     <artifactId>sof309-assignment</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>SOF309 Assignment - AI Driven Test Automation</name>
 
@@ -41,7 +41,25 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- (Tùy chọn) Web Server & DB cũ của sinh viên có thể dán thêm vào đây -->
+        <!-- ============================================== -->
+        <!-- [Y1] THƯ VIỆN WEB & DATABASE CỦA JOLLIEBEAR    -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.6.1.jre11</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -57,6 +75,13 @@
                 </configuration>
             </plugin>
 
+            <!-- Maven WAR Plugin cho dự án Servlet/JSP -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+            </plugin>
+
             <!-- Maven Surefire Plugin để tự động chạy Test -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -66,4 +91,3 @@
         </plugins>
     </build>
 </project>
-
