@@ -24,6 +24,38 @@ public class RegisterServlet extends HttpServlet {
         userDAO = new UserDAO();
     }
 
+    /**
+     * Hàm xử lý nghiệp vụ kiểm tra dữ liệu đăng ký (thuần Java để Unit Test Y3)
+     */
+    public static void validateRegistration(User user) {
+        if (user == null || user.getName() == null || user.getUsername() == null
+                || user.getPhone() == null || user.getEmail() == null || user.getPassword() == null) {
+            throw new IllegalArgumentException("Dữ liệu đăng ký không hợp lệ.");
+        }
+
+        String name = user.getName().trim();
+        String username = user.getUsername().trim();
+        String phone = user.getPhone().trim();
+        String email = user.getEmail().trim();
+        String password = user.getPassword();
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được để trống.");
+        }
+        if (!username.matches("^[a-zA-Z0-9_]{3,20}$")) {
+            throw new IllegalArgumentException("Tên đăng nhập phải từ 3-20 ký tự, chỉ gồm chữ, số hoặc gạch dưới.");
+        }
+        if (!phone.matches("^0\\d{9}$")) {
+            throw new IllegalArgumentException("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0.");
+        }
+        if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new IllegalArgumentException("Định dạng email không hợp lệ.");
+        }
+        if (password.length() < 6) {
+            throw new IllegalArgumentException("Mật khẩu phải có ít nhất 6 ký tự.");
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -45,11 +77,12 @@ public class RegisterServlet extends HttpServlet {
 
             User user = gson.fromJson(sb.toString(), User.class);
 
-            if (user == null || user.getName() == null || user.getUsername() == null
-                    || user.getPhone() == null || user.getEmail() == null || user.getPassword() == null) {
+            try {
+                validateRegistration(user);
+            } catch (IllegalArgumentException ex) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 jsonResponse.addProperty("status", "error");
-                jsonResponse.addProperty("message", "Dữ liệu đăng ký không hợp lệ.");
+                jsonResponse.addProperty("message", ex.getMessage());
                 out.print(gson.toJson(jsonResponse));
                 return;
             }
@@ -58,15 +91,6 @@ public class RegisterServlet extends HttpServlet {
             user.setUsername(user.getUsername().trim());
             user.setPhone(user.getPhone().trim());
             user.setEmail(user.getEmail().trim());
-
-            // Kiểm tra định dạng username: 3-20 ký tự, chỉ chữ/số/gạch dưới
-            if (!user.getUsername().matches("^[a-zA-Z0-9_]{3,20}$")) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                jsonResponse.addProperty("status", "error");
-                jsonResponse.addProperty("message", "Tên đăng nhập phải từ 3-20 ký tự, chỉ gồm chữ, số hoặc gạch dưới.");
-                out.print(gson.toJson(jsonResponse));
-                return;
-            }
 
             boolean success = userDAO.saveUser(user);
             if (success) {
